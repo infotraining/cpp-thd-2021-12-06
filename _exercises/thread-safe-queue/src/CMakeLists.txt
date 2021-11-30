@@ -1,0 +1,4 @@
+project(thread_safe_queue)
+
+add_library(thread_safe_queue_lib INTERFACE)
+target_include_directories(thread_safe_queue_lib INTERFACE ${CMAKE_CURRENT_SOURCE_DIR})
