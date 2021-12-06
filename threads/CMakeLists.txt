@@ -40,4 +40,4 @@ add_executable(${PROJECT_NAME} ${SRC_LIST} ${HEADERS_LIST})
 target_link_libraries(${PROJECT_NAME} Threads::Threads) 
 
 # Setting C++ standard
-target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_14)
+target_compile_features(${PROJECT_NAME} PUBLIC cxx_std_17)
