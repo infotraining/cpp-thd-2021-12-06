@@ -172,3 +172,4 @@ $RECYCLE.BIN/
 doc_pl/_build/*
 doc_en/_build/*
 code/.ionide/symbolCache.db
+pi-benchmarking/.ionide/symbolCache.db

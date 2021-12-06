@@ -213,7 +213,7 @@ double calc_pi_multithread_with_padding(counter_t throws)
     auto hardware_threads_count = max(thread::hardware_concurrency(), 1u);
     auto no_of_throws = throws / hardware_threads_count;
 
-    struct alignas(128) AlignedValue
+    struct alignas(std::hardware_destructive_interference_size) AlignedValue
     {
         counter_t value;
     };
