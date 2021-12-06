@@ -9,24 +9,31 @@
 
 using namespace std;
 
-void monte_carlo(long iterations, long& hits)
+void monte_carlo(size_t seed, long iterations, long& hits)
 {
-    random_device rd;
-    mt19937_64 rnd_gen {rd()};
+    mt19937_64 rnd_gen {seed};
     uniform_real_distribution<> distr(-1, 1);
+
+    long local_hits = 0;
 
     for (long n = 0; n < iterations; ++n)
     {
         double x = distr(rnd_gen);
         double y = distr(rnd_gen);
         if (x * x + y * y < 1)
-            hits++;
+        {
+            local_hits++;
+        //    hits++;
+        }
     }
+
+    hits += local_hits;
 }
 
 int main()
 {
     const long N = 100'000'000;
+    std::random_device rd;
 
     {
         cout << "Pi calculation started! - one thread" << endl;
@@ -34,7 +41,7 @@ int main()
 
         long hits{};
 
-        monte_carlo(N, hits);
+        monte_carlo(rd(), N, hits);
         
         const double pi = static_cast<double>(hits) / N * 4;
 
@@ -57,7 +64,7 @@ int main()
 
         for (int i = 0; i < threads.size(); ++i)
         {
-            threads[i] = std::thread {monte_carlo, N / no_of_threads, std::ref(results[i])};
+            threads[i] = std::thread {monte_carlo, rd(), N / no_of_threads, std::ref(results[i])};
         }
 
         for (auto& t : threads)
