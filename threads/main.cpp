@@ -60,6 +60,12 @@ public:
     }
 };
 
+
+std::thread create_thread(int id)
+{
+    return std::thread{&background_work, id, "text", 150ms};
+}
+
 int main()
 {
     std::cout << "Main thread starts..." << std::endl;
@@ -113,6 +119,24 @@ int main()
     for (const auto& item : backup)
         std::cout << item << " ";
     std::cout << std::endl;
+
+    ////////////////////////////////
+    // move semantics
+
+    std::thread thd_a = create_thread(665);
+
+    thd_a.join();
+
+    std::vector<std::thread> workers;
+
+    workers.push_back(create_thread(42));
+    workers.push_back(create_thread(43));
+    workers.push_back(create_thread(44));
+
+    for(auto& thd: workers)
+        thd.join();
+
+    std::cout << "No of cores: " << std::thread::hardware_concurrency() << std::endl;
 
     std::cout << "Main thread ends..." << std::endl;
 }
