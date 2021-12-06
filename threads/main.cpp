@@ -136,7 +136,15 @@ int main()
     for(auto& thd: workers)
         thd.join();
 
-    std::cout << "No of cores: " << std::thread::hardware_concurrency() << std::endl;
+    const auto no_of_cores = std::max(1u, std::thread::hardware_concurrency());
+    std::cout << "No of cores: " << std::max(1u, std::thread::hardware_concurrency()) << std::endl;
+
+    std::vector<std::thread> hardware_workers(no_of_cores);
+    hardware_workers[0] = std::thread{&background_work, 888, "TEXT", 100ms};
+
+    for(auto& thd: hardware_workers)
+        if (thd.joinable())
+            thd.join();
 
     std::cout << "Main thread ends..." << std::endl;
 }

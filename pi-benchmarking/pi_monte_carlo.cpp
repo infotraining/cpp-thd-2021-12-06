@@ -251,32 +251,32 @@ double calc_pi_multithread_local_counter(counter_t throws)
     return (accumulate(hits.begin(), hits.end(), 0.0) / throws) * 4;
 }
 
-double calc_pi_multithread_with_futures(counter_t throws)
-{
-    auto hardware_threads_count = max(thread::hardware_concurrency(), 1u);
-    auto no_of_throws = throws / hardware_threads_count;
+// double calc_pi_multithread_with_futures(counter_t throws)
+// {
+//     auto hardware_threads_count = max(thread::hardware_concurrency(), 1u);
+//     auto no_of_throws = throws / hardware_threads_count;
 
-    vector<future<counter_t>> future_hits(hardware_threads_count);
+//     vector<future<counter_t>> future_hits(hardware_threads_count);
 
-    for (unsigned int i = 0; i < hardware_threads_count; ++i)
-    {
-        future_hits[i] = std::async(std::launch::async, [no_of_throws] { return calc_hits(no_of_throws); });
-    }
+//     for (unsigned int i = 0; i < hardware_threads_count; ++i)
+//     {
+//         future_hits[i] = std::async(std::launch::async, [no_of_throws] { return calc_hits(no_of_throws); });
+//     }
 
-    return (accumulate(future_hits.begin(), future_hits.end(), 0.0, [](auto& hits, auto& f) { return hits += f.get(); }) / throws) * 4;
-}
+//     return (accumulate(future_hits.begin(), future_hits.end(), 0.0, [](auto& hits, auto& f) { return hits += f.get(); }) / throws) * 4;
+// }
 
-double calc_pi_parallel_stl(counter_t throws)
-{
-    const auto hardware_threads_count = std::max(1u, std::thread::hardware_concurrency());
-    const auto no_of_throws = throws / hardware_threads_count;
+// double calc_pi_parallel_stl(counter_t throws)
+// {
+//     const auto hardware_threads_count = std::max(1u, std::thread::hardware_concurrency());
+//     const auto no_of_throws = throws / hardware_threads_count;
 
-    std::vector<counter_t> results(hardware_threads_count, no_of_throws);
-    auto hits = std::transform_reduce(std::execution::par, results.begin(), results.end(), 0ULL, std::plus{}, [](auto n) { return calc_hits(n);});
+//     std::vector<counter_t> results(hardware_threads_count, no_of_throws);
+//     auto hits = std::transform_reduce(std::execution::par, results.begin(), results.end(), 0ULL, std::plus{}, [](auto n) { return calc_hits(n);});
 
-    return static_cast<double>(hits) / throws;
+//     return static_cast<double>(hits) / throws;
 
-}
+// }
 
 constexpr int N = 1'000'000;
 constexpr int no_of_samples = 1;
@@ -308,11 +308,11 @@ TEST_CASE("Monte Carlo Pi")
         return calc_pi_multithread_with_padding(N);
     };
 
-    BENCHMARK("futures") {
-        return calc_pi_multithread_with_futures(N);
-    };
+    // BENCHMARK("futures") {
+    //     return calc_pi_multithread_with_futures(N);
+    // };
 
-    BENCHMARK("ParallelSTL") {
-        return calc_pi_parallel_stl(N);
-    };
+    // BENCHMARK("ParallelSTL") {
+    //     return calc_pi_parallel_stl(N);
+    // };
 }
