@@ -89,7 +89,7 @@ void calc_hits_by_local_counter(counter_t n, counter_t& hits)
     hits += counter;
 }
 
-void calc_hits_by_ref_intenstive_incr_with_mutex(counter_t n, counter_t& hits, mutex& mtx)
+void calc_hits_by_ref_intensive_incr_with_mutex(counter_t n, counter_t& hits, mutex& mtx)
 {
     RandomEngine<double> rnd;
 
@@ -157,7 +157,7 @@ double calc_pi_multithread_with_mutex(counter_t throws)
     for (unsigned int i = 0; i < hardware_threads_count; ++i)
     {
         threads.emplace_back([&hits, &mtx, no_of_throws] {
-            calc_hits_by_ref_intenstive_incr_with_mutex(no_of_throws, hits, mtx);
+            calc_hits_by_ref_intensive_incr_with_mutex(no_of_throws, hits, mtx);
         });
     }
 
