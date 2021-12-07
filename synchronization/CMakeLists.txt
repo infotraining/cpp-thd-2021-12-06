@@ -1,3 +1,12 @@
+##############
+# Vcpkg integration - uncomment if necessery
+if(DEFINED ENV{VCPKG_ROOT} AND NOT DEFINED CMAKE_TOOLCHAIN_FILE)
+  set(CMAKE_TOOLCHAIN_FILE "$ENV{VCPKG_ROOT}/scripts/buildsystems/vcpkg.cmake"
+      CACHE STRING "")
+endif()
+
+message(STATUS "Vcpkg integration script found: " ${CMAKE_TOOLCHAIN_FILE})
+
 get_filename_component(PROJECT_NAME_STR ${CMAKE_SOURCE_DIR} NAME)
 string(REPLACE " " "_" ProjectId ${PROJECT_NAME_STR})
 
