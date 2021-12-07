@@ -27,7 +27,18 @@ void run(Synchronized<int>& counter)
 {
     for (long i = 0; i < 1'000'000; ++i)
     {
-        apply([&](int& v) { ++v; }, counter);
+        apply([&](int& v)
+            { ++v; },
+            counter);
+    }
+}
+
+void run_with_atomics(std::atomic<int>& counter)
+{
+    for (long i = 0; i < 1'000'000; ++i)
+    {
+        //++counter;
+        counter.fetch_add(1, std::memory_order_relaxed);
     }
 }
 
@@ -36,16 +47,31 @@ int main()
     std::cout << "Main thread starts..." << std::endl;
     const std::string text = "Hello Threads";
 
-    Synchronized<int> counter;
+    {
+        Synchronized<int> counter{};
 
-    std::thread thd1 {run, std::ref(counter)};
-    std::thread thd2 {[&counter]
-        { run(counter); }};
+        std::thread thd1 {run, std::ref(counter)};
+        std::thread thd2 {[&counter]
+            { run(counter); }};
 
-    thd1.join();
-    thd2.join();
+        thd1.join();
+        thd2.join();
 
-    std::cout << "counter: " << counter.value << "\n";
+        std::cout << "counter: " << counter.value << "\n";
+    }
+
+    {
+        std::atomic<int> counter{};
+
+        std::thread thd1 {run_with_atomics, std::ref(counter)};
+        std::thread thd2 {[&counter]
+            { run_with_atomics(counter); }};
+
+        thd1.join();
+        thd2.join();
+
+        std::cout << "counter: " << counter << "\n";
+    }
 
     std::cout << "Main thread ends..." << std::endl;
 }

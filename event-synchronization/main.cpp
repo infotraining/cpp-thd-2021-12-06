@@ -7,12 +7,14 @@
 #include <thread>
 #include <vector>
 #include <numeric>
+#include <atomic>
 
 using namespace std::literals;
 
 class Data
 {
     std::vector<int> data_;
+    std::atomic<bool> data_ready_{false};
 
 public:
     void read()
@@ -24,11 +26,17 @@ public:
         std::generate(begin(data_), end(data_), [&rnd]
             { return rnd() % 1000; });
         std::this_thread::sleep_for(2s);
-        std::cout << "End reading..." << std::endl;
+        std::cout << "End reading..." << std::endl;        
+        
+        data_ready_.store(true, std::memory_order_release);
+        //data_ready_ = true; // -> data_ready_.store(true, std::memory_order_seq_cst); XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
     }
 
     void process(int id)
-    {
+    {       
+        while(!data_ready_.load(std::memory_order_acquire)) // while(!data_ready_.load(std::memory_order_seq_cst)) XXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXXX
+        {}
+     
         long sum = std::accumulate(begin(data_), end(data_), 0L);
 
         std::cout << "Id: " << id << "; Sum: " << sum << std::endl;
@@ -44,6 +52,7 @@ int main()
 
     std::thread thd_producer {[&data]
         { data.read(); }};
+    
     std::thread thd_consumer1 {[&data]
         { data.process(1); }};
     std::thread thd_consumer2 {[&data]

@@ -1,5 +1,9 @@
 # Szkolenie - Programowanie wielowątkowe w C++ #
 
+## Linki
+
+* https://www.cl.cam.ac.uk/~pes20/cpp/cpp0xmappings.html
+
 ## Dokumentacja + slajdy
 
 * https://infotraining.bitbucket.io/cpp-thd
