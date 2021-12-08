@@ -2,7 +2,11 @@
 
 ## Linki
 
-* https://www.cl.cam.ac.uk/~pes20/cpp/cpp0xmappings.html
+* C/C++11 mappings to processors - https://www.cl.cam.ac.uk/~pes20/cpp/cpp0xmappings.html
+* Atomic weapons
+  * https://www.youtube.com/watch?v=A8eCGOqgvH4&ab_channel=toalexsmail
+  * https://www.youtube.com/watch?v=KeLBd2EJLOU&ab_channel=toalexsmail
+* Weakly ordered atomics - examples - https://www.youtube.com/watch?v=M15UKpNlpeM&ab_channel=CppCon
 
 ## Dokumentacja + slajdy
 
