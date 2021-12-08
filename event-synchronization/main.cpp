@@ -118,3 +118,55 @@ int main()
 
     std::cout << "Main thread ends..." << std::endl;
 }
+
+struct Logger
+{
+    void log(const std::string& msg)
+    {
+    }
+};
+
+template <typename T>
+class Singleton
+{
+    inline static T* ptr_instance_ {};
+    inline static std::once_flag once_init_flag_;
+
+    Singleton(const Singleton&) = delete;
+    Singleton& operator=(const Singleton&) = delete;
+
+public:
+    // static T& instance()
+    // {
+    //     if (!ptr_instance_)
+    //     {
+    //         std::lock_guard lk {mtx_instance_};
+    //         if (!ptr_instance_)
+    //         {
+    //             T* ptr = new T();
+    //             ptr_instance_.store(ptr);
+    //         }                
+    //     }
+    //     return *ptr_instance_;
+    // }
+
+    static T& instance()
+    {
+        std::call_once(once_init_flag_, [] { ptr_instance_ = new T(); });
+        
+        return *ptr_instance_;
+    }    
+};
+
+void double_checked_locking_pattern()
+{
+    std::thread thd1 {[]
+        { Singleton<Logger>::instance().log("THD1"); }};
+    std::thread thd2 {[]
+        { Singleton<Logger>::instance().log("THD2"); }};
+
+    thd1.join();
+    thd2.join();
+
+    Singleton<Logger>::instance().log("Main THD");
+}
