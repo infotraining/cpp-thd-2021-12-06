@@ -1,5 +1,9 @@
 # Szkolenie - Programowanie wielowątkowe w C++ #
 
+## Ankieta
+
+* https://forms.gle/8BJFuvyW4tkGY3pk7
+
 ## Linki
 
 * C/C++11 mappings to processors - https://www.cl.cam.ac.uk/~pes20/cpp/cpp0xmappings.html

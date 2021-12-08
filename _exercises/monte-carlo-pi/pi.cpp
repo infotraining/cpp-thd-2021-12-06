@@ -2,6 +2,7 @@
 #include <chrono>
 #include <cstdlib>
 #include <ctime>
+#include <future>
 #include <iostream>
 #include <numeric>
 #include <random>
@@ -29,6 +30,28 @@ void monte_carlo(size_t seed, long iterations, long& hits)
 
     hits += local_hits;
 }
+
+long monte_carlo(size_t seed, long iterations)
+{
+    mt19937_64 rnd_gen {seed};
+    uniform_real_distribution<> distr(-1, 1);
+
+    long local_hits = 0;
+
+    for (long n = 0; n < iterations; ++n)
+    {
+        double x = distr(rnd_gen);
+        double y = distr(rnd_gen);
+        if (x * x + y * y < 1)
+        {
+            local_hits++;
+        //    hits++;
+        }
+    }
+
+    return local_hits;
+}
+
 
 int main()
 {
@@ -64,7 +87,7 @@ int main()
 
         for (int i = 0; i < threads.size(); ++i)
         {
-            threads[i] = std::thread {monte_carlo, rd(), N / no_of_threads, std::ref(results[i])};
+            threads[i] = std::thread { [i, no_of_threads, &results, &rd, N] { return monte_carlo(rd(), N / no_of_threads, results[i]);} };
         }
 
         for (auto& t : threads)
@@ -83,5 +106,29 @@ int main()
         cout << "Elapsed = " << elapsed_time << "ms" << endl;
     }
 
+    { // future
+        cout << "Pi calculation started! - futures" << endl;
+        const auto start = chrono::high_resolution_clock::now();
+        const std::size_t no_of_threads = std::max(1u, std::thread::hardware_concurrency());
+
+        std::vector<std::future<long>> futures(no_of_threads);
+        std::generate_n(begin(futures), no_of_threads, [&] { 
+            return std::async(std::launch::async, [&]{ 
+                return monte_carlo(rd(), N/no_of_threads); 
+            });
+        });
+
+        long hits = std::accumulate(futures.begin(), futures.end(), 0l, [] (const long sum, std::future<long>& future){
+            return sum + future.get();
+        });
+
+        const double pi = static_cast<double>(hits) / N * 4;
+
+        const auto end = chrono::high_resolution_clock::now();
+        const auto elapsed_time = chrono::duration_cast<chrono::milliseconds>(end - start).count();
+
+        cout << "Pi = " << pi << endl;
+        cout << "Elapsed = " << elapsed_time << "ms" << endl;
+    }
     //////////////////////////////////////////////////////////////////////////////
 }
