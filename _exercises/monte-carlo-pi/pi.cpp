@@ -24,7 +24,7 @@ void monte_carlo(size_t seed, long iterations, long& hits)
         if (x * x + y * y < 1)
         {
             local_hits++;
-        //    hits++;
+            //    hits++;
         }
     }
 
@@ -45,13 +45,12 @@ long monte_carlo(size_t seed, long iterations)
         if (x * x + y * y < 1)
         {
             local_hits++;
-        //    hits++;
+            //    hits++;
         }
     }
 
     return local_hits;
 }
-
 
 int main()
 {
@@ -62,10 +61,10 @@ int main()
         cout << "Pi calculation started! - one thread" << endl;
         const auto start = chrono::high_resolution_clock::now();
 
-        long hits{};
+        long hits {};
 
         monte_carlo(rd(), N, hits);
-        
+
         const double pi = static_cast<double>(hits) / N * 4;
 
         const auto end = chrono::high_resolution_clock::now();
@@ -87,7 +86,8 @@ int main()
 
         for (int i = 0; i < threads.size(); ++i)
         {
-            threads[i] = std::thread { [i, no_of_threads, &results, &rd, N] { return monte_carlo(rd(), N / no_of_threads, results[i]);} };
+            threads[i] = std::thread {[i, no_of_threads, &results, &rd, N]
+                { return monte_carlo(rd(), N / no_of_threads, std::ref(results[i])); }};
         }
 
         for (auto& t : threads)
@@ -112,15 +112,21 @@ int main()
         const std::size_t no_of_threads = std::max(1u, std::thread::hardware_concurrency());
 
         std::vector<std::future<long>> futures(no_of_threads);
-        std::generate_n(begin(futures), no_of_threads, [&] { 
-            return std::async(std::launch::async, [&]{ 
-                return monte_carlo(rd(), N/no_of_threads); 
-            });
-        });
 
-        long hits = std::accumulate(futures.begin(), futures.end(), 0l, [] (const long sum, std::future<long>& future){
-            return sum + future.get();
-        });
+        for (auto& thd : futures)
+            thd = std::async(std::launch::async, [&]
+                { return monte_carlo(rd(), N / no_of_threads); });
+
+        // std::generate_n(begin(futures), no_of_threads, [&]
+        //     { return std::async(std::launch::async, [&]
+        //           { return monte_carlo(rd(), N / no_of_threads); }); });
+
+        // long hits = std::accumulate(futures.begin(), futures.end(), 0l, [](const long sum, std::future<long>& future)
+        //     { return sum + future.get(); });
+
+        long hits = 0;
+        for (auto& f : futures)
+            hits += f.get();
 
         const double pi = static_cast<double>(hits) / N * 4;
 

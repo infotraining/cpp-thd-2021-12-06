@@ -59,7 +59,7 @@ public:
 
         cv_q_not_empty.wait(l, [this] { return !queue.empty(); });
 
-        item = queue.front();
+        item = std::move(queue.front());
         queue.pop();
     }
 
